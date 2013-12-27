@@ -1,6 +1,6 @@
 # Yin Yang
 
-Version : 0.1 alpha
+Version : 0.1 alpha -- 12/27/2013
 
 ## Overview
 
