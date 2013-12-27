@@ -1,6 +1,7 @@
 # Yin Yang
 
 Version : 0.1 alpha -- 12/27/2013
+[![Build Status](https://travis-ci.org/Isammoc/yinyang.png)](https://travis-ci.org/Isammoc/yinyang)
 
 ## Overview
 
