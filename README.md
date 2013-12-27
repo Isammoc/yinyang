@@ -1,7 +1,10 @@
 # Yin Yang
 
 Version : 0.1 alpha -- 12/27/2013
+
 [![Build Status](https://travis-ci.org/Isammoc/yinyang.png)](https://travis-ci.org/Isammoc/yinyang)
+
+You may visit the [demo server](http://shrouded-plains-7049.herokuapp.com/)
 
 ## Overview
 
@@ -62,6 +65,10 @@ not so much works... It is alpha version after all).
 [Isammoc](https://github.com/Isammoc)
 
 
-## Next step
+## Next steps
 
-Begin the walkthrough with introduction, and the requirements.
+ * Add Bootstrap
+ * Make a home page
+ * Create a game
+ * List games waiting for opponent
+ * Join a game
