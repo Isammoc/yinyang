@@ -4,3 +4,14 @@ global.brand.name=Yin-Yang
 
 # Navbar
 navbar.toggle=Toggle navigation
+
+# Home page
+home.title=Accueil
+home.begin.title=Commencer une nouvelle partie
+home.begin.text=Vous voulez jouer sans attendre, c''est ici :
+home.begin.button=Nouvelle partie
+
+home.join.title=Rejoindre une partie
+home.join.text=Rejoignez une partie
+home.join.button=Rejoindre une partie au hasard
+home.join.games.none=Aucune partie pour le moment

@@ -67,8 +67,6 @@ not so much works... It is alpha version after all).
 
 ## Next steps
 
- * Add Bootstrap
- * Make a home page
  * Create a game
  * List games waiting for opponent
  * Join a game
