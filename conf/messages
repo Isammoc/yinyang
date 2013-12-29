@@ -15,3 +15,6 @@ home.join.title=Rejoindre une partie
 home.join.text=Rejoignez une partie
 home.join.button=Rejoindre une partie au hasard
 home.join.games.none=Aucune partie pour le moment
+
+# Game page
+game.title=Partie #{0}
