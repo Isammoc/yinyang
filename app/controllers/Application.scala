@@ -12,7 +12,8 @@ object Application extends Controller {
   }
 
   def index = Action {
-    Ok(views.html.index())
+    val waitingGames = List.range(0, currentId)
+    Ok(views.html.index(waitingGames))
   }
 
   def newGame = Action {

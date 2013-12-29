@@ -1,3 +1,5 @@
+@(waitingGames: List[Int])
+
 @main(Messages("home.title")) {
     <div class="jumbotron">
         <h1>@Messages("global.brand.name")</h1>
@@ -12,9 +14,17 @@
             <h2>@Messages("home.join.title")</h2>
             <p>@Messages("home.join.text")</p>
             <ul class="list-group">
-                <li class="list-group-item">
-                    @Messages("home.join.games.none")
-                </li>
+                @if(waitingGames.isEmpty) {
+                    <li class="list-group-item">
+                        @Messages("home.join.games.none")
+                    </li>
+                } else {
+                    @for(game <- waitingGames) {
+                        <li class="list-group-item">
+                            @Messages("home.join.games.one", game)
+                        </li>
+                    }
+                }
             </ul>
             <p><a href="#" class="btn btn-primary" disabled>@Messages("home.join.button")</a></p>
         </div>
