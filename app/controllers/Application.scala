@@ -2,25 +2,32 @@ package controllers
 
 import play.api._
 import play.api.mvc._
+import play.api.Play.current
+import com.typesafe.plugin.RedisPlugin
+import org.sedis.Dress
 
 object Application extends Controller {
-  var currentId = 0
-  def nextId = {
-    val ans = currentId
-    currentId += 1
-    ans
-  }
 
   def index = Action {
-    val waitingGames = List.range(0, currentId)
-    Ok(views.html.index(waitingGames))
+    current.plugin[RedisPlugin].map ( _.sedisPool.withJedisClient { client =>
+      import Dress._
+      client.setnx("game:next.id", "0")
+      val current = client.get("game:next.id")
+      val waitingGames = List.range(1, current.toLong + 1)
+      Ok(views.html.index(waitingGames))
+    }).getOrElse(InternalServerError("Redis Play Plugin not here"))
   }
 
   def newGame = Action {
-    Redirect(routes.Application.game(nextId))
+    current.plugin[RedisPlugin].map ( _.sedisPool.withJedisClient { client =>
+      import Dress._
+      client.setnx("game:next.id", "0")
+      val nextId = client.incr("game:next.id")
+      Redirect(routes.Application.game(nextId))
+    }).getOrElse(InternalServerError("Redis Play Plugin not here"))
   }
 
-  def game(id: Int) = Action {
+  def game(id: Long) = Action {
     Ok(views.html.game(id))
   }
 }

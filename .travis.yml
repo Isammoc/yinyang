@@ -1,4 +1,6 @@
 language: scala # to trigger the build on JVM worker ('language: java' works the same)
+services:
+  - redis-server
 env:
   - PLAY_VERSION=2.2.1 # Latest 2.1.x
 before_script: 

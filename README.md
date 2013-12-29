@@ -67,6 +67,4 @@ not so much works... It is alpha version after all).
 
 ## Next steps
 
- * Create a game
- * List games waiting for opponent
- * Join a game
+ * Join a game waiting for an opponent
