@@ -1,9 +1,9 @@
-@(id: Long)(implicit request: controllers.Application.AuthenticatedRequest[_])
+@(game: GameInformation)(implicit request: controllers.Application.AuthenticatedRequest[_])
 
-@main(Messages("game.title", id)) {
+@main(Messages("game.title", game.id)) {
     <div class="row">
         <div class="span-md-12">
-            <h1>@Messages("game.title", id)</h1>
+            <h1>@Messages("game.title", game.id)</h1>
         </div>
     </div>
 }

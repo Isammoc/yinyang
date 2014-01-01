@@ -1,4 +1,4 @@
-@(waitingGames: List[Long])(implicit request: controllers.Application.AuthenticatedRequest[_])
+@(waitingGames: Iterable[models.GameInformation])(implicit request: controllers.Application.AuthenticatedRequest[_])
 
 @main(Messages("home.title")) {
     <div class="jumbotron">
@@ -21,7 +21,7 @@
                 } else {
                     @for(game <- waitingGames) {
                         <li class="list-group-item">
-                            @Messages("home.join.games.one", game)
+                            @Messages("home.join.games.one", game.id)
                         </li>
                     }
                 }

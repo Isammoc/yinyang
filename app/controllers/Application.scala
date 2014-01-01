@@ -9,24 +9,22 @@ import play.api.mvc._
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
 import redis.clients.jedis.Jedis
+import models.GameInformation
 
 object Application extends Controller {
 
   def index = Authenticated { implicit request =>
-    request.jedis.setnx("game:next.id", "0")
-    val current = request.jedis.get("game:next.id")
-    val waitingGames = List.range(1, current.toLong + 1)
-    Ok(views.html.index(waitingGames))
+    Ok(views.html.index(GameInformation.getWaitings(request.jedis)))
   }
 
   def newGame = Authenticated { implicit request =>
-    request.jedis.setnx("game:next.id", "0")
-    val nextId = request.jedis.incr("game:next.id")
-    Redirect(routes.Application.game(nextId))
+    Redirect(routes.Application.game(GameInformation.create(request.user)(request.jedis).id))
   }
 
   def game(id: Long) = Authenticated { implicit request =>
-    Ok(views.html.game(id))
+    GameInformation.fromId(id)(request.jedis)
+      .map (game => Ok(views.html.game(game)))
+        .getOrElse(Redirect(routes.Application.index))
   }
 
   class JedisRequest[A](val jedis: Jedis, request: Request[A]) extends WrappedRequest[A](request)
