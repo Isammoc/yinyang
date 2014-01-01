@@ -1,4 +1,4 @@
-@(waitingGames: List[Long])
+@(waitingGames: List[Long])(implicit request: controllers.Application.AuthenticatedRequest[_])
 
 @main(Messages("home.title")) {
     <div class="jumbotron">

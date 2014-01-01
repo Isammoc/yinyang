@@ -1,6 +1,7 @@
 
 # Global
 global.brand.name=Yin-Yang
+global.user.name.anonymous=Anne Onyme ({0})
 
 # Navbar
 navbar.toggle=Toggle navigation

@@ -1,4 +1,4 @@
-@(id: Long)
+@(id: Long)(implicit request: controllers.Application.AuthenticatedRequest[_])
 
 @main(Messages("game.title", id)) {
     <div class="row">
