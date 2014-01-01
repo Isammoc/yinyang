@@ -20,3 +20,6 @@ home.join.games.one=Partie #{0}
 
 # Game page
 game.title=Partie #{0}
+game.creator=Créateur
+game.opponent=Adversaire
+game.waiting=Cette partie attend un adversaire.

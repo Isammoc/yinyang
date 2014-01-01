@@ -18,7 +18,16 @@ case class GameInformation(id: Long, creator: User, opponent: Option[User]) {
         jedis.set("game:" + id + ":creator", creator.id.toString)
         jedis.set("game:" + id + ":opponent", opponent.id.toString)
     }
-    
+  }
+
+  def join(user: User)(implicit jedis: Jedis): Option[GameInformation] = {
+    opponent match {
+      case None if user != this.creator =>
+        val answer = this.copy(opponent = Some(user))
+        answer.save
+        Some(answer)
+      case _ => None
+    }
   }
 }
 

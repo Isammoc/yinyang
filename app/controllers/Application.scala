@@ -27,6 +27,13 @@ object Application extends Controller {
         .getOrElse(Redirect(routes.Application.index))
   }
 
+  def join(id: Long) = Authenticated { implicit request =>
+    implicit val _ = request.jedis
+    GameInformation.fromId(id)
+      .flatMap (game => game.join(request.user))
+      .map (game => Redirect(routes.Application.game(game.id)))
+        .getOrElse(Redirect(routes.Application.index))
+  }
   class JedisRequest[A](val jedis: Jedis, request: Request[A]) extends WrappedRequest[A](request)
 
   object JedisAction extends ActionBuilder[JedisRequest] {

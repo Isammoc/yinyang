@@ -1,32 +1,36 @@
 @(waitingGames: Iterable[models.GameInformation])(implicit request: controllers.Application.AuthenticatedRequest[_])
 
 @main(Messages("home.title")) {
-    <div class="jumbotron">
-        <h1>@Messages("global.brand.name")</h1>
+  <div class="jumbotron">
+    <h1>@Messages("global.brand.name")</h1>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <h2>@Messages("home.begin.title")</h2>
+      <p>@Messages("home.begin.text")</p>
+      <p><a href="@routes.Application.newGame" class="btn btn-primary">@Messages("home.begin.button")</a></p>
     </div>
-    <div class="row">
-        <div class="col-md-6">
-            <h2>@Messages("home.begin.title")</h2>
-            <p>@Messages("home.begin.text")</p>
-            <p><a href="@routes.Application.newGame" class="btn btn-primary">@Messages("home.begin.button")</a></p>
-        </div>
-        <div class="col-md-6">
-            <h2>@Messages("home.join.title")</h2>
-            <p>@Messages("home.join.text")</p>
-            <ul class="list-group">
-                @if(waitingGames.isEmpty) {
-                    <li class="list-group-item">
-                        @Messages("home.join.games.none")
-                    </li>
-                } else {
-                    @for(game <- waitingGames) {
-                        <li class="list-group-item">
-                            @Messages("home.join.games.one", game.id)
-                        </li>
-                    }
-                }
-            </ul>
-            <p><a href="#" class="btn btn-primary" disabled>@Messages("home.join.button")</a></p>
-        </div>
+    <div class="col-md-6">
+      <h2>@Messages("home.join.title")</h2>
+      <p>@Messages("home.join.text")</p>
+      <ul class="list-group">
+        @if(waitingGames.isEmpty) {
+          <li class="list-group-item">
+            @Messages("home.join.games.none")
+          </li>
+        } else {
+          @for(game <- waitingGames) {
+            <li class="list-group-item">
+              @if(game.creator == request.user) {
+                @Messages("home.join.games.one", game.id)
+              } else {
+                <a href="@routes.Application.join(game.id)">@Messages("home.join.games.one", game.id)</a>
+              }
+            </li>
+          }
+        }
+      </ul>
+      <p><a href="#" class="btn btn-primary" disabled>@Messages("home.join.button")</a></p>
     </div>
+  </div>
 }
