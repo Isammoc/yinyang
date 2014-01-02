@@ -10,30 +10,48 @@ import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
 import redis.clients.jedis.Jedis
 import models.GameInformation
+import play.libs.Akka
+import actors.GamesManager
+import akka.pattern.ask
+import akka.util.Timeout
+import scala.concurrent.duration._
 
 object Application extends Controller {
+  implicit val _ = Timeout(3 seconds)
+  val gamesManagerRef = Akka.system().actorOf(GamesManager.props)
 
-  def index = Authenticated { implicit request =>
-    Ok(views.html.index(GameInformation.getWaitings(request.jedis)))
+  def index = Authenticated.async { implicit request =>
+    (gamesManagerRef ? GamesManager.ListWaitingGames).map {
+      case GamesManager.MultipleOperationOk(games) =>
+        Ok(views.html.index(GameInformation.getWaitings(request.jedis)))
+    }
   }
 
-  def newGame = Authenticated { implicit request =>
-    Redirect(routes.Application.game(GameInformation.create(request.user)(request.jedis).id))
+  def newGame = Authenticated.async { implicit request =>
+    (gamesManagerRef ? GamesManager.Create(request.user)).map {
+      case GamesManager.SimpleOperationOk(game) =>
+        Redirect(routes.Application.game(game.id))
+    }
   }
 
-  def game(id: Long) = Authenticated { implicit request =>
-    GameInformation.fromId(id)(request.jedis)
-      .map (game => Ok(views.html.game(game)))
-        .getOrElse(Redirect(routes.Application.index))
+  def game(id: Long) = Authenticated.async { implicit request =>
+    (gamesManagerRef ? GamesManager.Find(id)).map {
+      case GamesManager.SimpleOperationOk(game) =>
+        Ok(views.html.game(game))
+      case GamesManager.OperationFailed =>
+        Redirect(routes.Application.index)
+    }
   }
 
-  def join(id: Long) = Authenticated { implicit request =>
-    implicit val _ = request.jedis
-    GameInformation.fromId(id)
-      .flatMap (game => game.join(request.user))
-      .map (game => Redirect(routes.Application.game(game.id)))
-        .getOrElse(Redirect(routes.Application.index))
+  def join(id: Long) = Authenticated.async { implicit request =>
+    (gamesManagerRef ? GamesManager.Join(id, request.user)).map {
+      case GamesManager.SimpleOperationOk(game) =>
+        Redirect(routes.Application.game(game.id))
+      case GamesManager.OperationFailed =>
+        Redirect(routes.Application.index)
+    }
   }
+
   class JedisRequest[A](val jedis: Jedis, request: Request[A]) extends WrappedRequest[A](request)
 
   object JedisAction extends ActionBuilder[JedisRequest] {
