@@ -18,7 +18,7 @@ import scala.concurrent.duration._
 
 object Application extends Controller {
   implicit val _ = Timeout(3 seconds)
-  val gamesManagerRef = Akka.system().actorOf(GamesManager.props)
+  def gamesManagerRef = Akka.system.actorSelection("user/gamesManager")
 
   def index = Authenticated.async { implicit request =>
     (gamesManagerRef ? GamesManager.ListWaitingGames).map {
