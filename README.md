@@ -28,7 +28,7 @@ Take care that may kill kitties and bring the apocalypse.
  
 ## System requirements
 
- * [Play framework](http://www.playframework.com/) : 2.2.1
+ * [Play framework](http://www.playframework.com/) : 2.2.2
 
 ## Quick start
 
