@@ -30,28 +30,3 @@ case class Game(id: Long, creator: User, opponent: Option[User]) {
     }
   }
 }
-
-object Game {
-  def fromId(id: Long)(implicit jedis: Jedis): Option[Game] = {
-    val sedis = org.sedis.Dress.up(jedis)
-    sedis.get("game:" + id + ":creator").map{creatorId =>
-    val opponent = sedis.get("game:" + id + ":opponent").map(_.toLong).map(User.fromId)
-    new Game(id, User.fromId(creatorId.toLong), opponent)}
-  }
-
-  def create(user: User)(implicit jedis: Jedis): Game = {
-    jedis.setnx("game:next.id", "0")
-    val id = jedis.incr("game:next.id")
-    val game = new Game(id, user, None)
-    game.save
-    game
-  }
-
-  def getWaitings(implicit jedis: Jedis): Set[Game] = {
-    val sedis = org.sedis.Dress.up(jedis)
-    sedis.smembers("game:waitings").map (_.toLong).flatMap (gameId => fromId(gameId) match {
-      case None => Set.empty[Game]
-      case Some(x) => Set(x)
-    })
-  }
-}
