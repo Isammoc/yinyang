@@ -2,7 +2,7 @@ package actors
 
 import akka.actor.Actor
 import models.User
-import models.GameInformation
+import models.Game
 import play.api.Play.current
 import com.typesafe.plugin.RedisPlugin
 import akka.actor.Props
@@ -15,16 +15,16 @@ class GamesManager extends Actor {
   def receive: Receive = {
     case Create(user) =>
       sedisPool.withJedisClient { implicit client =>
-        sender ! SimpleOperationOk(GameInformation.create(user))
+        sender ! SimpleOperationOk(Game.create(user))
       }
     case ListWaitingGames => {
       sedisPool.withJedisClient { implicit client =>
-        sender ! MultipleOperationOk(GameInformation.getWaitings)
+        sender ! MultipleOperationOk(Game.getWaitings)
       }
     }
     case Join(id: Long, user: User) => 
       sedisPool.withJedisClient { implicit client =>
-        GameInformation.fromId(id)
+        Game.fromId(id)
           .flatMap(_.join(user)) match {
           case None => sender ! OperationFailed
           case Some(game) => sender ! SimpleOperationOk(game)
@@ -32,7 +32,7 @@ class GamesManager extends Actor {
       }
     case Find(id: Long) =>
       sedisPool.withJedisClient { implicit client =>
-        GameInformation.fromId(id) match {
+        Game.fromId(id) match {
           case None => sender ! OperationFailed
           case Some(game) => sender ! SimpleOperationOk(game)
         }
@@ -49,9 +49,9 @@ object GamesManager {
 
   // Answers
   abstract class OperationAck()
-  case class SimpleOperationOk(game: GameInformation) extends OperationAck
+  case class SimpleOperationOk(game: Game) extends OperationAck
   case class OperationFailed() extends OperationAck
-  case class MultipleOperationOk(games: Iterable[GameInformation]) extends OperationAck
+  case class MultipleOperationOk(games: Iterable[Game]) extends OperationAck
 
   val props = Props[GamesManager]
 }

@@ -9,7 +9,7 @@ import play.api.mvc._
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
 import redis.clients.jedis.Jedis
-import models.GameInformation
+import models.Game
 import play.libs.Akka
 import actors.GamesManager
 import akka.pattern.ask
@@ -23,7 +23,7 @@ object Application extends Controller {
   def index = Authenticated.async { implicit request =>
     (gamesManagerRef ? GamesManager.ListWaitingGames).map {
       case GamesManager.MultipleOperationOk(games) =>
-        Ok(views.html.index(GameInformation.getWaitings(request.jedis)))
+        Ok(views.html.index(Game.getWaitings(request.jedis)))
     }
   }
 
