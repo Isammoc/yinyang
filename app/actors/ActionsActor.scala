@@ -6,6 +6,7 @@ import actors.game.GamesManager
 import actors.user.UsersManager
 import akka.actor.ActorRef
 import akka.actor.Props
+import models.Game
 
 class ActionsActor extends Actor {
   import ActionsActor._
@@ -15,7 +16,8 @@ class ActionsActor extends Actor {
 
   def receive: Receive = {
     case NewGame(creator) =>
-      context.actorOf(Props(new NewGameActor(gamesManagerRef, usersManagerRef))) forward NewGame(creator)
+      val requester = sender
+      context.actorOf(Props(new NewGameActor(requester, creator, gamesManagerRef, usersManagerRef))) forward NewGame(creator)
     case ChangeNickname(user, nickname) =>
       usersManagerRef forward UsersManager.ChangeNickname(user, nickname)
     case NewUser =>
@@ -24,22 +26,15 @@ class ActionsActor extends Actor {
       usersManagerRef forward UsersManager.GetOrConnectUser(id)
     case UsersStat =>
       usersManagerRef forward UsersManager.UsersStat
+    case ListWaitingGames =>
+      gamesManagerRef forward GamesManager.ListWaitingGames
   }
 }
 
-class NewGameActor(gamesManagerRef: ActorRef, usersManagerRef: ActorRef) extends Actor {
-  var requester: ActorRef = null
+class NewGameActor(requester: ActorRef, creator: User, gamesManagerRef: ActorRef, usersManagerRef: ActorRef) extends Actor {
+  usersManagerRef ! UsersManager.GetOrConnectUserActor(creator.id)
 
-  def receive: Receive = init
-
-  def init: Receive = {
-    case ActionsActor.NewGame(creator) =>
-      requester = sender
-      usersManagerRef ! UsersManager.GetOrConnectUserActor(creator.id)
-      context become waitingForUserRef
-  }
-
-  def waitingForUserRef: Receive = {
+  def receive: Receive = {
     case creatorRef: ActorRef =>
       gamesManagerRef.tell(GamesManager.New(creatorRef), requester)
       context stop self
@@ -52,6 +47,7 @@ object ActionsActor {
   case object NewUser
   case class GetOrConnectUser(id: Long)
   case object UsersStat
+  case object ListWaitingGames
 
   def props = Props[ActionsActor]
 }

@@ -17,25 +17,17 @@ class GameActor(id: Long, creatorRef: ActorRef) extends Actor {
 
   def waiting: Receive = {
     case Get =>
-      context.actorOf(Props(new WaitingGameActor(id, creatorRef))) forward Get
+      val s = sender
+      context.actorOf(Props(new WaitingGameActor(s, id, creatorRef))) forward Get
     case Terminated(ref) if ref == creatorRef =>
       context stop self
   }
 }
 
-class WaitingGameActor(id: Long, creatorRef: ActorRef) extends Actor {
+class WaitingGameActor(requester: ActorRef, id: Long, creatorRef: ActorRef) extends Actor {
   creatorRef ! ConnectedUserActor.Get
-  var requester: ActorRef = null
 
-  def receive: Receive = init
-  def init: Receive = {
-    case GameActor.Get =>
-      requester = sender
-      creatorRef ! ConnectedUserActor.Get
-      context become waitingUserRef
-  }
-
-  def waitingUserRef: Receive = {
+  def receive: Receive = {
     case creator: models.User =>
       requester ! Game(id, creator, None)
   }

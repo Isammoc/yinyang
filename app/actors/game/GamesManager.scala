@@ -5,7 +5,6 @@ import akka.actor.ActorRef
 import akka.actor.Terminated
 import models.Game
 import akka.actor.Props
-import actors.game.GameActor
 import akka.actor.actorRef2Scala
 
 class GamesManager extends Actor {
@@ -24,10 +23,13 @@ class GamesManager extends Actor {
       val child = context.actorOf(GameActor.props(newId, creatorRef))
       waitingGames += (newId -> child)
       child forward GameActor.Get
+    case ListWaitingGames =>
+      val requester = sender
+      context.actorOf(Props(new WaitingsGameList(requester, waitingGames))) forward ListWaitingGames
   }
 }
 
-class WaintingsGameList(requester: ActorRef, waitingGames: Map[Long, ActorRef]) extends Actor {
+class WaitingsGameList(requester: ActorRef, waitingGames: Map[Long, ActorRef]) extends Actor {
   var answer = List.empty[Game]
   var pending = waitingGames
   pending.values.foreach { gameRef =>
@@ -36,7 +38,9 @@ class WaintingsGameList(requester: ActorRef, waitingGames: Map[Long, ActorRef]) 
   }
   check
 
-  def receive: Receive = {
+  def receive: Receive = init
+
+  def init: Receive = {
     case Terminated(ref) =>
       pending.find { case (_, gameRef) => gameRef == ref }.foreach { case (id, _) => pending -= id }
       check
@@ -45,9 +49,10 @@ class WaintingsGameList(requester: ActorRef, waitingGames: Map[Long, ActorRef]) 
       answer = game :: answer
       check
   }
+
   def check: Unit = {
     if (pending.isEmpty) {
-      requester ! answer
+      requester ! answer.sortBy(_.id)
       context stop self
     }
   }
@@ -55,6 +60,7 @@ class WaintingsGameList(requester: ActorRef, waitingGames: Map[Long, ActorRef]) 
 
 object GamesManager {
   case class New(creatorRef: ActorRef)
+  case object ListWaitingGames
 
   def props = Props[GamesManager]
 }

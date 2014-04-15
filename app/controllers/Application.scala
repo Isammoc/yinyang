@@ -10,13 +10,16 @@ import play.api.data.Forms._
 import actors.game.GamesManager
 import actors.ActionsActor
 import scala.concurrent.Future
+import models.Game
 
 object Application extends Controller {
 
   def actionsRef = Akka.system.actorSelection("user/actions")
 
-  def index = Authenticated { implicit request =>
-    Ok(views.html.index())
+  def index = Authenticated.async { implicit request =>
+    (actionsRef ? ActionsActor.ListWaitingGames).mapTo[List[Game]].map(games => 
+    Ok(views.html.index(games))
+    )
   }
 
   def newGame = Authenticated.async { implicit request =>
