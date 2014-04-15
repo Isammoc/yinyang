@@ -11,6 +11,3 @@ case class AnonymousUser(id:Long) extends User {
   val isRegistred = false
 }
 
-case class RegistredUser(id:Long, login: String) extends User {
-  val isRegistred = true
-}

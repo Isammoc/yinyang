@@ -2,6 +2,7 @@
 # Global
 global.brand.name=Yin-Yang
 global.user.name.anonymous=Anne Onyme ({0})
+global.stats.simple=Il y a actuellement {0,choice, 1#1 connecté|1< {0,number,integer} connectés}
 
 # Navbar
 navbar.toggle=Toggle navigation
