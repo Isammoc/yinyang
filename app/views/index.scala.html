@@ -1,4 +1,4 @@
-@()(implicit context: controllers.ViewContext)
+@(games: List[models.Game])(implicit context: controllers.ViewContext)
 
 @main(Messages("home.title")) {
   <div class="jumbotron">
@@ -8,12 +8,19 @@
     <div class="col-md-6">
       <h2>@Messages("home.begin.title")</h2>
       <p>@Messages("home.begin.text")</p>
-      <p><a href="#" class="btn btn-primary">@Messages("home.begin.button")</a></p>
+      <p><a href="@routes.Application.newGame" class="btn btn-primary">@Messages("home.begin.button")</a></p>
     </div>
     <div class="col-md-6">
       <h2>@Messages("home.join.title")</h2>
       <p>@Messages("home.join.text")</p>
       <ul class="list-group">
+        @if(games.isEmpty) {
+          <li>@Messages("home.join.games.none")</li>
+        } else {
+          @for(game <- games) {
+            <li>@Messages("home.join.games.one", game.id, displayName(game.creator))</li>
+          }
+        }
       </ul>
       <p><a href="#" class="btn btn-primary" disabled>@Messages("home.join.button")</a></p>
     </div>

@@ -12,6 +12,7 @@ import play.api.mvc.WrappedRequest
 import play.libs.Akka
 import models.User
 import models.SimpleStatistics
+import actors.ActionsActor
 
 package object controllers {
   implicit val _ = Timeout(3 seconds)
@@ -21,7 +22,7 @@ package object controllers {
     val stats: SimpleStatistics
   }
 
-  def usersManagerRef = Akka.system.actorSelection("user/usersManager")
+  def actionsRef = Akka.system.actorSelection("user/actions")
 
   class AuthenticatedRequest[A](val currentUser: User, val stats: SimpleStatistics, request: Request[A]) extends WrappedRequest[A](request) with ViewContext
 
@@ -29,9 +30,9 @@ package object controllers {
     def invokeBlock[A](request: Request[A], block: (AuthenticatedRequest[A]) => Future[SimpleResult]) = {
       for {
         currentUser <- request.session.get("userId")
-          .fold(usersManagerRef ? UsersManager.New)(userId => usersManagerRef ? UsersManager.GetOrConnectUser(userId.toLong))
+          .fold(actionsRef ? ActionsActor.NewUser)(userId => actionsRef ? ActionsActor.GetOrConnectUser(userId.toLong))
           .mapTo[User]
-        usersStats <- (usersManagerRef ? UsersManager.UsersStat).mapTo[UsersManager.UsersStat]
+        usersStats <- (actionsRef ? ActionsActor.UsersStat).mapTo[UsersManager.UsersStat]
         stats = SimpleStatistics(usersStats.connectedCount)
         simpleResult <- block(new AuthenticatedRequest(currentUser, stats, request))
           .map(_.withSession(request.session + ("userId" -> currentUser.id.toString)))
