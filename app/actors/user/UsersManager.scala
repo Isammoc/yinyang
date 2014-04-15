@@ -27,6 +27,8 @@ class UsersManager extends Actor {
       sender ! UsersStat(connectedUsers.size)
     case ConnectedUserActor.Disconnected(id) =>
       connectedUsers -= id
+    case ChangeNickname(user, nickname) =>
+      connectedUsers.getOrElse(user.id, createChild(user.id)) forward ConnectedUserActor.NicknameUser(nickname)
   }
 
   def createChild(id: Long) = {
@@ -45,5 +47,6 @@ object UsersManager {
   case object UsersStat
   case class UsersStat(connectedCount: Int)
 
+  case class ChangeNickname(user: models.User, nickname: String)
   def props = Props[UsersManager]
 }
