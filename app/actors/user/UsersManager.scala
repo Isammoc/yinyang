@@ -25,6 +25,8 @@ class UsersManager extends Actor {
       createChild(newId) forward ConnectedUserActor.Get
     case UsersStat =>
       sender ! UsersStat(connectedUsers.size)
+    case ConnectedUserActor.Disconnected(id) =>
+      connectedUsers -= id
   }
 
   def createChild(id: Long) = {

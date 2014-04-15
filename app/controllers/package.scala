@@ -1,7 +1,7 @@
 import scala.annotation.implicitNotFound
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
-import scala.concurrent.duration.DurationInt
+import scala.concurrent.duration._
 import actors.user.UsersManager
 import akka.pattern.ask
 import akka.util.Timeout
