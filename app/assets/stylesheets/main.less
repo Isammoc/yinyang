@@ -1,0 +1,25 @@
+g.blackRules g rect {
+  fill: #444;
+  stroke: #000;
+  stroke-width: 2;
+}
+
+#game-board.rule-maker.user-black g.blackRules g:hover * {
+  fill: #555;
+  cursor: pointer;
+}
+
+
+g.whiteRules g rect {
+  fill: #ddd;
+  stroke: #000;
+  stroke-width: 2;
+  .possible() {
+    fill: #eee;
+  }
+}
+
+#game-board.rule-maker.user-white g.whiteRules g:hover * {
+  fill: #eee;
+  cursor: pointer;
+}
