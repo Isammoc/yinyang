@@ -1,4 +1,4 @@
-@()
+@()(implicit request: play.api.mvc.Request[_])
 <!DOCTYPE html>
 
 <html>
@@ -29,8 +29,16 @@
         <ul class="nav navbar-nav">
         </ul>
         <ul class="nav navbar-nav navbar-right">
-          <li>
-            <p class="navbar-text yy-nickname">Non connecté</p>
+          <li class="dropdown">
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown"><span class="yy-nickname">Non connecté</span><b class="caret"></b></a>
+            <ul class="dropdown-menu">
+              <form id="form-nickname">
+                <div class="form-group">
+                  <input type="text" id="nickname">
+                </div>
+                <button type="submit" class="btn">Changer de pseudo</button>
+              </form>
+            </ul>
           </li>
           <li style="width: 149px;">
             <a href="https://github.com/Isammoc/yinyang"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png"></a>
@@ -41,43 +49,21 @@
     <div class="container" id="main">
       <div class="jumbotron">
         <h1>@Messages("global.brand.name")</h1>
-        <button id="btn-connection" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#modal-connection">Jouer</button>
-        <div class="modal fade" id="modal-connection" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-          <div class="modal-dialog">
-            <div class="modal-content">
-              <form id="form-connection">
-                <div class="modal-header">
-                  <h4 class="modal-title" id="myModalLabel">Comment doit-on vous appeler ?</h4>
-                </div>
-                <div class="modal-body">
-                  <div class="form-group">
-                    <label for="nickname">Pseudo :</label>
-                    <input id="nickname" type="text" class="form-control" />
-                  </div>
-                </div>
-                <div class="modal-footer">
-                  <button type="submit" class="btn btn-primary" data-dismiss="modal">Jouer</button>
-                </div>
-              </form>
-            </div>
-          </div>
+      </div>
+      <div id="game" class="hidden row">
+        <div class="col-md-6">
+          Noir : <span class="yy-black-nickname"></span>
+        </div>
+        <div class="col-md-6">
+          Blanc : <span class="yy-white-nickname"></span>
         </div>
       </div>
     </div>
+
+
+    <div id="yinyang" />
     <script src="//code.jquery.com/jquery-2.1.0.min.js" type="text/javascript"></script>
     <script src="//netdna.bootstrapcdn.com/bootstrap/3.0.3/js/bootstrap.min.js"></script>
-    <script>
-(function($, undefined){
-	$('#form-connection').on('submit', function(event) {
-		console.log('submit');
-		event.preventDefault();
-		console.log('nickname = ' + $('#nickname').val())
-		$('.yy-nickname').text($('#nickname').val());
-	});
-	$('#modal-connection').on('shown.bs.modal', function() {
-		$('#nickname').focus();
-	});
-})(jQuery);
-    </script>
+    <script src="@routes.Application.mainJS"></script>
   </body>
 </html>
