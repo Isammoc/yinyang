@@ -1,6 +1,0 @@
-@(user: models.User)
-
-@user match {
-  case models.AnonymousUser(id) => { @Messages("global.user.name.anonymous", user.id) }
-  case models.GuestUser(_, nickname) => { @nickname }
-}
