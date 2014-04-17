@@ -17,6 +17,8 @@ class GameActor extends Actor {
 
   var spectators = Queue.empty[ActorRef]
 
+  val boardRef = context.actorOf(GameBoardActor.props)
+
   def all = {
     val withWhite = whiteRef.fold(spectators)(_ +: spectators)
     blackRef.fold(withWhite)(_ +: withWhite)
@@ -38,6 +40,8 @@ class GameActor extends Actor {
         sender.tell(ListenerSupport.Listen, old)
       }
       sender ! ListenerSupport.Listen
+      boardRef.tell(ListenerSupport.Listen, sender)
+      boardRef.tell(GameBoardActor.Get, sender)
       all.foreach(ref => self.tell(GetInformation, ref))
 
     case GetInformation =>
@@ -90,8 +94,6 @@ class GetInformation(requester: ActorRef, whiteRef: Option[ActorRef], blackRef: 
 object GameActor {
   case object GetInformation
   case object Join
-
-  case class Game(whiteRef: Option[ActorRef], blackRef: Option[ActorRef])
 
   def props = Props[GameActor]
 }

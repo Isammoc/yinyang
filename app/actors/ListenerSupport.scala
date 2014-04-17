@@ -24,6 +24,15 @@ class ListenerSupport(observableRef: ActorRef) extends Actor {
   }
 }
 
+trait ObservableActor extends Actor {
+  import ListenerSupport._
+  val listeners = context.actorOf(ListenerSupport.props(self))
+  def listen: Receive = {
+    case event: ListenerSupport.ListenEvent =>
+      listeners forward event
+  }
+}
+
 object ListenerSupport {
   abstract class ListenEvent
   case object Listen extends ListenEvent

@@ -9,18 +9,17 @@ import play.api.libs.functional.syntax._
 import models.User
 import play.api.data.validation.ValidationError
 import models.GameInformation
+import models.Game
 
-class WebSocketActor(channel: Concurrent.Channel[JsValue]) extends Actor {
+class WebSocketActor(channel: Concurrent.Channel[JsValue]) extends ObservableActor {
   import WebSocketActor._
 
   val id: Long = Random.nextInt
   var username = s"Anne Onyme (${id})"
 
-  val listeners = context.actorOf(ListenerSupport.props(self))
-
   self ! Send(JsObject(Seq("type" -> JsString("self"), "content" -> Json.toJson(User(id, username)))))
 
-  def receive: Receive = {
+  def receive: Receive = listen orElse {
     case Received(value) =>
       Json.fromJson[Command](value)(readsCommand).map { self ! _ }
     case Send(value) =>
@@ -32,14 +31,13 @@ class WebSocketActor(channel: Concurrent.Channel[JsValue]) extends Actor {
 
     case gi: GameInformation =>
       self ! Send(JsObject(Seq("type" -> JsString("game"), "content" -> Json.toJson(gi))))
+    case game: Game =>
+      self ! Send(JsObject(Seq("type" -> JsString("board"), "content" -> Json.toJson(game))))
     case Disconnected =>
       println("disconnected")
       context stop self
     case Get =>
       sender ! User(id, username)
-
-    case event: ListenerSupport.ListenEvent =>
-      listeners forward event
 
     case msg: User =>
       self ! Send(JsObject(Seq("type" -> JsString("username"), "content" -> Json.toJson(msg))))
