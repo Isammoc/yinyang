@@ -17,8 +17,7 @@
 			}
 		}
 		this.wsSocket.onclose = function(event) {
-			console.log("close");
-			console.log(event)
+			$('#modal-disconnected').modal();
 		}
 	}
 
