@@ -23,6 +23,7 @@
 	}
 
 	yinyang.receiveEvent = function(event) {
+		console.log(event)
 		var data = JSON.parse(event.data);
 		$yinyang.trigger('yy-' + data.type, data.content);
 	}

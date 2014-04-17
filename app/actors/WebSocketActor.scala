@@ -11,10 +11,12 @@ import play.api.data.validation.ValidationError
 import models.GameInformation
 
 class WebSocketActor(channel: Concurrent.Channel[JsValue]) extends Actor {
+  import WebSocketActor._
+
   val id: Long = Random.nextInt
   var username = s"Anne Onyme (${id})"
 
-  import WebSocketActor._
+  val listeners = context.actorOf(ListenerSupport.props(self))
 
   self ! Send(JsObject(Seq("type" -> JsString("self"), "content" -> Json.toJson(User(id, username)))))
 
@@ -26,14 +28,21 @@ class WebSocketActor(channel: Concurrent.Channel[JsValue]) extends Actor {
     case ChangeUsernameCommand(newUsername) =>
       username = newUsername
       self ! Send(JsObject(Seq("type" -> JsString("self"), "content" -> Json.toJson(User(id, username)))))
-    
-    case gi:GameInformation =>
+      listeners ! User(id, username)
+
+    case gi: GameInformation =>
       self ! Send(JsObject(Seq("type" -> JsString("game"), "content" -> Json.toJson(gi))))
     case Disconnected =>
       println("disconnected")
       context stop self
     case Get =>
       sender ! User(id, username)
+
+    case event: ListenerSupport.ListenEvent =>
+      listeners forward event
+
+    case msg: User =>
+      self ! Send(JsObject(Seq("type" -> JsString("username"), "content" -> Json.toJson(msg))))
   }
 }
 

@@ -11,6 +11,9 @@
 			} else if (data.id == $('.yy-black-nickname').data('user-id')){
 				$('#game-board').addClass('user-black')
 			}
+			$('.yy-username').filter(function(){
+				return $(this).data('user-id') == data.id
+			}).text(data.username);
 		})
 		.on('yy-game', function(event, data) {
 			$('#game-board')
@@ -44,6 +47,11 @@
 					.text('En attente...')
 					.removeData('user-id');
 			}
+		})
+		.on('yy-username', function(event, data) {
+			$('.yy-username').filter(function(){
+				return $(this).data('user-id') == data.id
+			}).text(data.username);
 		});
 	yinyang.connect("@routes.Application.connect.webSocketURL()")
 	

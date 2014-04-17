@@ -7,6 +7,7 @@ import akka.actor.Terminated
 import models.User
 import models.GameInformation
 import models.GameInformation
+import scala.collection.immutable.Queue
 
 class GameActor extends Actor {
   import GameActor._
@@ -14,11 +15,11 @@ class GameActor extends Actor {
   var whiteRef = Option.empty[ActorRef]
   var blackRef = Option.empty[ActorRef]
 
-  var spectators = List.empty[ActorRef]
+  var spectators = Queue.empty[ActorRef]
 
   def all = {
-    val withWhite = whiteRef.fold(spectators)(_ :: spectators)
-    blackRef.fold(withWhite)(_ :: withWhite)
+    val withWhite = whiteRef.fold(spectators)(_ +: spectators)
+    blackRef.fold(withWhite)(_ +: withWhite)
   }
 
   def receive = {
@@ -29,9 +30,14 @@ class GameActor extends Actor {
       } else if (whiteRef.isEmpty) {
         whiteRef = Some(sender)
       } else {
-        spectators = sender :: spectators
+        spectators +:= sender
       }
       context.watch(sender)
+      older.foreach { old =>
+        old.tell(ListenerSupport.Listen, sender)
+        sender.tell(ListenerSupport.Listen, old)
+      }
+      sender ! ListenerSupport.Listen
       all.foreach(ref => self.tell(GetInformation, ref))
 
     case GetInformation =>

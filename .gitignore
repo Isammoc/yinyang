@@ -16,3 +16,7 @@ dist
 /.cache
 /.target
 /bin
+
+# Eclipse Scala Worksheet plugin
+.worksheet/
+*.sc
