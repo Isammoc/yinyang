@@ -1,4 +1,3 @@
-@()(implicit request: play.api.mvc.Request[_])
 (function($, undefined) {
 	var $yinyang = $('#yy-yinyang');
 
@@ -14,6 +13,7 @@
 			$('.yy-username').filter(function(){
 				return $(this).data('user-id') == data.id
 			}).text(data.username);
+			yinyang.ui.refresh();
 		})
 		.on('yy-game', function(event, data) {
 			$('#game-board')
@@ -61,7 +61,7 @@
 			}
 		});
 
-	yinyang.connect("@routes.Application.connect.webSocketURL()")
+	yinyang.connect($yinyang.data("ws-url"))
 	
 	$('#form-nickname').on('submit', function(event){
 		event.preventDefault();
@@ -94,7 +94,7 @@
 
 	yinyang.ui.initBoard = function(rawGame) {
 		var game = {}
-		
+
 		// Init tokens
 		game.token = [];
 		game.tokenIdx = 0
@@ -207,30 +207,30 @@
 				.attr("x", 130)
 				.attr("y", 10);
 
-		if($('yy-nickname').data('user-id') == $('yy-black-nickname').data('user-id')) {
-			game.user = 'black';
-		} else if($('yy-nickname').data('user-id') == $('yy-white-nickname').data('user-id')) {
-			game.user = 'white';
-		} else {
-			game.user = undefined
-		}
 		game.state = rawGame.state;
 		yinyang.game = game;
 		yinyang.ui.refresh();
 	};
 
 	yinyang.ui.refresh = function() {
-		yinyang.ui.refreshModel();
-		yinyang.ui.refreshUI();
+		if(yinyang.game) {
+			yinyang.ui.refreshModel();
+			yinyang.ui.refreshUI();
+		}
 	}
 
 	yinyang.ui.refreshModel = function() {
-		if(yinyang.game) {
-			var canSelectBlackRules = yinyang.game.user == 'black' && yinyang.game.state == 'Init';
-			for(var i = 0; i < 4; i++) {
-				yinyang.game.blackRules[i].available = true;
-			}
+		if($yinyang.data('user-id') == $('.yy-black-nickname').data('user-id')) {
+			yinyang.game.user = 'black';
+		} else if($yinyang.data('user-id') == $('.yy-white-nickname').data('user-id')) {
+			yinyang.game.user = 'white';
+		} else {
+			yinyang.game.user = undefined
 		}
+		var canSelectBlackRules = yinyang.game.user == 'black' && yinyang.game.state == 'Init';
+		for(var i = 0; i < 4; i++) {
+			yinyang.game.blackRules[i].available = canSelectBlackRules;
+			}
 	}
 
 	yinyang.ui.refreshUI = function() {
@@ -245,9 +245,11 @@
 			.transition().duration(1000)
 			.attr('opacity', 1)
 			.attr("transform", function(d) {return "translate(1030, " + (20 + 250 * d.key) + ") scale(1)";});
-		blackRules.on("click", function(d){
-			d.selected = true;
-			yinyang.ui.refreshUI();
+		blackRules.on("click", function(d) {
+			if(d.available) {
+				d.selected = true;
+				yinyang.ui.refreshUI();
+			}
 		});
 		blackRules.exit().remove();
 		var oneRule = blackRules.selectAll("rect").data(function(d){return [d]});
@@ -265,7 +267,7 @@
 		var oneRuleAvailable = oneRule.selectAll("animateTransform").data(function(d){
 			if(d.available) {
 				return [d];
-			}
+			} else return [];
 		})
 		oneRuleAvailable.enter()
 			.append("animate")
@@ -321,7 +323,7 @@
 				.attr("y", 10);
 	}
 
-	d3.xml("@routes.Assets.at("svg/yinyang.svg")", "image/svg+xml", function(xml) {
+	d3.xml($yinyang.data('svg-url'), "image/svg+xml", function(xml) {
 		d3.select("#game-board").node().appendChild(document.importNode(xml.documentElement, true));
 
 		d3.select("#game-board svg")

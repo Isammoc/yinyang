@@ -40,8 +40,4 @@ object Application extends Controller {
         (in, out)
     }
   }
-  
-  def mainJS = Action {implicit request =>
-    Ok(views.js.main())
-  }
 }

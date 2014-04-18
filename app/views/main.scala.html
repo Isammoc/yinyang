@@ -77,11 +77,11 @@
         </div>
       </div>
     </div>
-    <div id="yy-yinyang"></div>
+    <div id="yy-yinyang" data-ws-url="@routes.Application.connect.webSocketURL()" data-svg-url="@routes.Assets.at("svg/yinyang.svg")"></div>
     <script src="//code.jquery.com/jquery-2.1.0.min.js" type="text/javascript"></script>
     <script src="//netdna.bootstrapcdn.com/bootstrap/3.0.3/js/bootstrap.min.js"></script>
     <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
     <script src="@routes.Assets.at("javascripts/yinyang-websocket.js")"></script>
-    <script src="@routes.Application.mainJS"></script>
+    <script src="@routes.Assets.at("javascripts/main.js")"></script>
   </body>
 </html>
