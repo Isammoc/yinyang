@@ -1,11 +1,11 @@
 (function($, undefined) {
 	var $yinyang = $('#yy-yinyang');
 
-	yinyang = {
-		wsSocket : undefined
+	var ws = {
+		wsSocket: undefined
 	}
 
-	yinyang.connect = function(wsUrl) {
+	ws.connect = function(wsUrl) {
 		var self = this;
 		this.wsSocket = new WebSocket(wsUrl);
 		this.wsSocket.onmessage = this.receiveEvent;
@@ -21,13 +21,13 @@
 		}
 	}
 
-	yinyang.receiveEvent = function(event) {
+	ws.receiveEvent = function(event) {
 		console.log(event)
 		var data = JSON.parse(event.data);
 		$yinyang.trigger('yy-' + data.type, data.content);
 	}
 
-	yinyang.setUsername = function(username) {
+	ws.setUsername = function(username) {
 		if (localStorage) {
 			localStorage['username'] = username;
 		}
@@ -37,4 +37,5 @@
 		}
 		this.wsSocket.send(JSON.stringify(data));
 	}
+	$yinyang.data('ws', ws)
 })(jQuery);

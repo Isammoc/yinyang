@@ -1,6 +1,9 @@
 (function($, undefined) {
 	var $yinyang = $('#yy-yinyang');
 
+	var yinyang = {};
+	var ws = $yinyang.data('ws');
+
 	$yinyang
 		.on('yy-self', function(event, data) {
 			$yinyang.data('user-id', data.id)
@@ -61,11 +64,11 @@
 			}
 		});
 
-	yinyang.connect($yinyang.data("ws-url"))
+	ws.connect($yinyang.data("ws-url"))
 	
 	$('#form-nickname').on('submit', function(event){
 		event.preventDefault();
-		yinyang.setUsername($('#nickname').val());
+		ws.setUsername($('#nickname').val());
 	});
 
 	yinyang.ui = {}
@@ -323,6 +326,7 @@
 				.attr("y", 10);
 	}
 
+	// SVG Init
 	d3.xml($yinyang.data('svg-url'), "image/svg+xml", function(xml) {
 		d3.select("#game-board").node().appendChild(document.importNode(xml.documentElement, true));
 
